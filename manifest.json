@@ -1,7 +1,7 @@
 {
   "name": "28",
   "short_name": "28",
-  "description": "Flo Pro–level period and symptom tracker, fully private and personal.",
+  "description": "Period and symptom tracker with Flo Pro-level intelligence.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff6fa",

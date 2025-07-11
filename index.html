@@ -1,127 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#fddbe5">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="bunny-icon.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>28</title>
+  <meta name="theme-color" content="#f8c8dc" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="bunny-icon.png" />
   <style>
-    :root {
-      --accent: #f8c8dc;
-      --light-bg: #fff6fa;
-      --light-text: #444;
-      --dark-bg: #1c1c1e;
-      --dark-text: #f2f2f2;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
+      margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--light-bg);
-      color: var(--light-text);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background: #fff6fa;
+      color: #333;
     }
-
-    header, footer {
-      padding: 12px 16px;
-      text-align: center;
-      background-color: var(--accent);
+    header {
+      background: #f8c8dc;
       color: white;
+      padding: 12px;
+      text-align: center;
       font-weight: bold;
     }
-
-    main {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-    }
-
     .tabbar {
       display: flex;
-      justify-content: space-around;
-      background-color: #fff;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: white;
       border-top: 1px solid #ccc;
     }
-
     .tab {
       flex: 1;
       padding: 10px;
-      font-size: 12px;
       text-align: center;
       cursor: pointer;
-      color: var(--light-text);
+      font-size: 14px;
     }
-
     .tab.active {
-      color: var(--accent);
+      color: #f8c8dc;
+      font-weight: bold;
     }
-
-    .hidden {
+    main {
+      padding: 16px;
+      padding-bottom: 80px;
+    }
+    section {
       display: none;
     }
-
-    h2 {
-      margin-bottom: 12px;
+    section.active {
+      display: block;
     }
-
-    .button {
-      background: var(--accent);
+    button {
+      background: #f8c8dc;
       color: white;
       border: none;
-      padding: 12px 18px;
-      border-radius: 24px;
+      padding: 10px 16px;
       font-size: 16px;
-      margin-top: 12px;
-      width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
   <header>28</header>
-
   <main>
-    <!-- Home -->
-    <section id="home">
+    <section id="home" class="active">
       <h2>Today's Overview</h2>
-      <button class="button" onclick="logPeriod()">Log Period Start</button>
-      <p id="last-period">Last period: -</p>
-      <p id="next-period">Next expected: -</p>
+      <button onclick="logToday()">Log Today as Period Start</button>
+      <p id="lastPeriod">Last Period: -</p>
+      <p id="nextPeriod">Next Predicted: -</p>
     </section>
-
-    <!-- Calendar -->
-    <section id="calendar" class="hidden">
+    <section id="calendar">
       <h2>Calendar</h2>
-      <p>[Calendar will appear here]</p>
+      <p>[Calendar UI coming]</p>
     </section>
-
-    <!-- Insights -->
-    <section id="insights" class="hidden">
-      <h2>Personal Insights</h2>
-      <p>[Smart pattern-based insights will appear here]</p>
+    <section id="insights">
+      <h2>Insights</h2>
+      <p>[Smart insights coming soon]</p>
     </section>
-
-    <!-- Logs -->
-    <section id="logs" class="hidden">
-      <h2>Period + Symptom Logs</h2>
-      <p>[Logged entries will show here]</p>
+    <section id="logs">
+      <h2>Logs</h2>
+      <p>[Symptom logs coming soon]</p>
     </section>
-
-    <!-- Settings -->
-    <section id="settings" class="hidden">
+    <section id="settings">
       <h2>Settings</h2>
-      <button class="button" onclick="toggleTheme()">Toggle Theme</button>
+      <button onclick="toggleTheme()">Toggle Theme</button>
     </section>
   </main>
-
   <footer class="tabbar">
     <div class="tab active" onclick="switchTab('home')">Home</div>
     <div class="tab" onclick="switchTab('calendar')">Calendar</div>
@@ -136,12 +101,12 @@
 
     function switchTab(id) {
       tabs.forEach(t => t.classList.remove("active"));
-      sections.forEach(s => s.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
+      sections.forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
       event.target.classList.add("active");
     }
 
-    function logPeriod() {
+    function logToday() {
       const today = new Date().toISOString();
       localStorage.setItem("lastPeriod", today);
       updatePeriodInfo();
@@ -153,8 +118,8 @@
         const last = new Date(stored);
         const next = new Date(last);
         next.setDate(last.getDate() + 28);
-        document.getElementById("last-period").textContent = `Last period: ${last.toDateString()}`;
-        document.getElementById("next-period").textContent = `Next expected: ${next.toDateString()}`;
+        document.getElementById("lastPeriod").textContent = "Last Period: " + last.toDateString();
+        document.getElementById("nextPeriod").textContent = "Next Predicted: " + next.toDateString();
       }
     }
 
