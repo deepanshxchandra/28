@@ -1,0 +1,22 @@
+{
+  "name": "28",
+  "short_name": "28",
+  "description": "Flo Pro–level period and symptom tracker, fully private and personal.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff6fa",
+  "theme_color": "#f8c8dc",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "bunny-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "bunny-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,185 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww12720\viewh7800\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!--\
+"28" Web App \'96 Flo Pro-Level Replica (Version 1: Core Layout)\
+- Multi-page layout with bottom nav bar\
+- Light pink theme\
+- Minimal UI with no transitions\
+- Pages: Home, Calendar, Insights, Logs, Settings\
+- Basic routing using JavaScript\
+- PWA-ready, mobile-first design\
+-->\
+\
+<!DOCTYPE html>\
+<html lang="en">\
+<head>\
+  <meta charset="UTF-8">\
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+  <meta name="theme-color" content="#fddbe5">\
+  <link rel="manifest" href="manifest.json">\
+  <link rel="icon" href="bunny-icon.png">\
+  <title>28</title>\
+  <style>\
+    :root \{\
+      --accent: #f8c8dc;\
+      --light-bg: #fff6fa;\
+      --light-text: #444;\
+      --dark-bg: #1c1c1e;\
+      --dark-text: #f2f2f2;\
+    \}\
+\
+    * \{\
+      box-sizing: border-box;\
+      margin: 0;\
+      padding: 0;\
+    \}\
+\
+    body \{\
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;\
+      background-color: var(--light-bg);\
+      color: var(--light-text);\
+      height: 100vh;\
+      display: flex;\
+      flex-direction: column;\
+    \}\
+\
+    header, footer \{\
+      padding: 12px 16px;\
+      text-align: center;\
+      background-color: var(--accent);\
+      color: white;\
+      font-weight: bold;\
+    \}\
+\
+    main \{\
+      flex: 1;\
+      padding: 16px;\
+      overflow-y: auto;\
+    \}\
+\
+    .tabbar \{\
+      display: flex;\
+      justify-content: space-around;\
+      background-color: #fff;\
+      border-top: 1px solid #ccc;\
+    \}\
+\
+    .tab \{\
+      flex: 1;\
+      padding: 10px;\
+      font-size: 12px;\
+      text-align: center;\
+      cursor: pointer;\
+      color: var(--light-text);\
+    \}\
+\
+    .tab.active \{\
+      color: var(--accent);\
+    \}\
+\
+    .hidden \{\
+      display: none;\
+    \}\
+\
+    h2 \{\
+      margin-bottom: 12px;\
+    \}\
+\
+    .button \{\
+      background: var(--accent);\
+      color: white;\
+      border: none;\
+      padding: 12px 18px;\
+      border-radius: 24px;\
+      font-size: 16px;\
+      margin-top: 12px;\
+      width: 100%;\
+    \}\
+  </style>\
+</head>\
+<body>\
+  <header>28</header>\
+\
+  <main>\
+    <!-- Home -->\
+    <section id="home">\
+      <h2>Today's Overview</h2>\
+      <button class="button" onclick="logPeriod()">Log Period Start</button>\
+      <p id="last-period">Last period: -</p>\
+      <p id="next-period">Next expected: -</p>\
+    </section>\
+\
+    <!-- Calendar -->\
+    <section id="calendar" class="hidden">\
+      <h2>Calendar</h2>\
+      <p>[Calendar will appear here]</p>\
+    </section>\
+\
+    <!-- Insights -->\
+    <section id="insights" class="hidden">\
+      <h2>Personal Insights</h2>\
+      <p>[Smart pattern-based insights will appear here]</p>\
+    </section>\
+\
+    <!-- Logs -->\
+    <section id="logs" class="hidden">\
+      <h2>Period + Symptom Logs</h2>\
+      <p>[Logged entries will show here]</p>\
+    </section>\
+\
+    <!-- Settings -->\
+    <section id="settings" class="hidden">\
+      <h2>Settings</h2>\
+      <button class="button" onclick="toggleTheme()">Toggle Theme</button>\
+    </section>\
+  </main>\
+\
+  <footer class="tabbar">\
+    <div class="tab active" onclick="switchTab('home')">Home</div>\
+    <div class="tab" onclick="switchTab('calendar')">Calendar</div>\
+    <div class="tab" onclick="switchTab('insights')">Insights</div>\
+    <div class="tab" onclick="switchTab('logs')">Logs</div>\
+    <div class="tab" onclick="switchTab('settings')">Settings</div>\
+  </footer>\
+\
+  <script>\
+    const tabs = document.querySelectorAll(".tab");\
+    const sections = document.querySelectorAll("main > section");\
+\
+    function switchTab(id) \{\
+      tabs.forEach(t => t.classList.remove("active"));\
+      sections.forEach(s => s.classList.add("hidden"));\
+      document.getElementById(id).classList.remove("hidden");\
+      event.target.classList.add("active");\
+    \}\
+\
+    function logPeriod() \{\
+      const today = new Date().toISOString();\
+      localStorage.setItem("lastPeriod", today);\
+      updatePeriodInfo();\
+    \}\
+\
+    function updatePeriodInfo() \{\
+      const stored = localStorage.getItem("lastPeriod");\
+      if (stored) \{\
+        const last = new Date(stored);\
+        const next = new Date(last);\
+        next.setDate(last.getDate() + 28);\
+        document.getElementById("last-period").textContent = `Last period: $\{last.toDateString()\}`;\
+        document.getElementById("next-period").textContent = `Next expected: $\{next.toDateString()\}`;\
+      \}\
+    \}\
+\
+    function toggleTheme() \{\
+      document.body.classList.toggle("dark");\
+    \}\
+\
+    updatePeriodInfo();\
+  </script>\
+</body>\
+</html>}
