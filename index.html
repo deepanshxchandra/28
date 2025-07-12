@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,13 +23,19 @@
 </head>
 <body>
   <header>28</header>
+
   <section id="home" class="active">
     <h2>Overview</h2>
     <button onclick="logPeriod()">Log Period Start</button>
     <div id="lastPeriod"></div>
     <div id="nextPeriod"></div>
   </section>
-  <section id="calendar"><h2>Cycle Calendar</h2><div class="calendar" id="calendarGrid"></div></section>
+
+  <section id="calendar">
+    <h2>Cycle Calendar</h2>
+    <div class="calendar" id="calendarGrid"></div>
+  </section>
+
   <section id="logs">
     <h2>Log Symptoms</h2>
     <select id="symptomSelect">
@@ -42,20 +47,25 @@
     <button onclick="logSymptom()">Log Symptom</button>
     <div id="symptomHistory"></div>
   </section>
-  <section id="insights"><h2>AI Insights</h2><div id="aiInsights"></div></section>
-  <section id="pregnancy">
-    <h2>Pregnancy Tracker</h2>
-    <input type="date" id="dueDate">
-    <button onclick="trackPregnancy()">Track</button>
-    <div id="pregnancyOutput"></div>
+
+  <section id="insights">
+    <h2>AI Insights</h2>
+    <div id="aiInsights"></div>
   </section>
+
+  <section id="settings">
+    <h2>Settings</h2>
+    <p>Coming soon: Theme switch, export data, partner sharing.</p>
+  </section>
+
   <footer>
     <div class="tab active" onclick="switchTab('home')">Home</div>
     <div class="tab" onclick="switchTab('calendar')">Calendar</div>
     <div class="tab" onclick="switchTab('logs')">Logs</div>
     <div class="tab" onclick="switchTab('insights')">Insights</div>
-    <div class="tab" onclick="switchTab('pregnancy')">Pregnancy</div>
+    <div class="tab" onclick="switchTab('settings')">Settings</div>
   </footer>
+
   <script>
     const tabs = document.querySelectorAll(".tab");
     const sections = document.querySelectorAll("section");
@@ -65,44 +75,43 @@
       event.target.classList.add("active");
       document.getElementById(id).classList.add("active");
     }
+
     function logPeriod() {
       const now = new Date().toISOString();
       let periods = JSON.parse(localStorage.getItem("periods") || "[]");
       periods.push(now);
       localStorage.setItem("periods", JSON.stringify(periods));
-      renderOverview(); renderCalendar();
+      renderOverview();
+      renderCalendar();
     }
+
     function logSymptom() {
       const sym = document.getElementById("symptomSelect").value;
       const today = new Date().toISOString().split('T')[0];
       let logs = JSON.parse(localStorage.getItem("symptoms") || "{}");
       logs[today] = (logs[today] || []).concat(sym);
       localStorage.setItem("symptoms", JSON.stringify(logs));
-      renderLogs(); renderInsights();
+      renderLogs();
+      renderInsights();
     }
-    function trackPregnancy() {
-      const due = document.getElementById("dueDate").value;
-      const d = new Date(due);
-      const now = new Date();
-      const daysLeft = Math.floor((d - now) / (1000 * 3600 * 24));
-      const weeks = Math.floor((280 - daysLeft) / 7);
-      document.getElementById("pregnancyOutput").innerText =
-        daysLeft > 0 ? `Week ${weeks + 1} of pregnancy` : "Due date passed or invalid.";
-    }
+
     function renderOverview() {
       let periods = JSON.parse(localStorage.getItem("periods") || "[]");
       if (periods.length) {
         const last = new Date(periods[periods.length - 1]);
-        const next = new Date(last); next.setDate(next.getDate() + 28);
+        const next = new Date(last);
+        next.setDate(next.getDate() + 28);
         document.getElementById("lastPeriod").innerText = `Last Period: ${last.toDateString()}`;
         document.getElementById("nextPeriod").innerText = `Predicted Next: ${next.toDateString()}`;
       }
     }
+
     function renderCalendar() {
       const grid = document.getElementById("calendarGrid");
       grid.innerHTML = "";
       let periods = JSON.parse(localStorage.getItem("periods") || "[]");
-      let start = new Date(); start.setDate(1);
+      let start = new Date();
+      start.setDate(1);
       const first = start.getDay();
       for (let i = 0; i < first; i++) grid.innerHTML += "<div></div>";
       const days = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
@@ -119,6 +128,7 @@
         grid.appendChild(cell);
       }
     }
+
     function renderLogs() {
       const logs = JSON.parse(localStorage.getItem("symptoms") || "{}");
       let html = "<ul>";
@@ -128,6 +138,7 @@
       html += "</ul>";
       document.getElementById("symptomHistory").innerHTML = html;
     }
+
     function renderInsights() {
       const logs = JSON.parse(localStorage.getItem("symptoms") || "{}");
       const counts = {};
@@ -140,7 +151,11 @@
       }
       document.getElementById("aiInsights").innerHTML = html || "<p>Track more to get insights.</p>";
     }
-    renderOverview(); renderCalendar(); renderLogs(); renderInsights();
+
+    renderOverview();
+    renderCalendar();
+    renderLogs();
+    renderInsights();
   </script>
 </body>
 </html>
