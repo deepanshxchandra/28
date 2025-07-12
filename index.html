@@ -1,62 +1,55 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>28 – Flo Pro Replica</title>
-  <meta name="theme-color" content="#f8c8dc" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="bunny-icon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>28 - Flo Pro AI WebApp</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="bunny-icon.png"/>
   <style>
-    body { font-family: -apple-system, sans-serif; background: #fff6fa; margin: 0; padding-bottom: 80px; }
-    header { background: #f8c8dc; color: white; padding: 12px; text-align: center; font-weight: bold; }
-    .tabbar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #ccc; }
-    .tab { flex: 1; padding: 10px; text-align: center; font-weight: bold; color: #aaa; cursor: pointer; }
-    .tab.active { color: #f8c8dc; }
-    main { padding: 16px; }
-    section { display: none; }
+    body { font-family: sans-serif; margin: 0; background: #fff6fa; }
+    header { background: #f8c8dc; color: white; text-align: center; padding: 16px; font-size: 20px; font-weight: bold; }
+    footer { position: fixed; bottom: 0; display: flex; width: 100%; background: white; border-top: 1px solid #ccc; }
+    .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; color: #999; }
+    .tab.active { color: #f8c8dc; font-weight: bold; }
+    section { display: none; padding: 16px; }
     section.active { display: block; }
-    button, select, input[type="date"] { background: #f8c8dc; color: white; border: none; padding: 10px; font-size: 16px; border-radius: 8px; margin-top: 10px; display: block; }
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 16px; }
-    .calendar-day { padding: 6px; text-align: center; border-radius: 6px; background: #fff; }
-    .calendar-day.period { background: #fdd; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 16px; }
+    .day { padding: 8px; border-radius: 6px; text-align: center; background: white; }
+    .day.period { background: #fdd; }
+    .day.ovulation { background: #cdf; }
+    select, input, button { display: block; margin: 10px 0; padding: 8px; border-radius: 6px; border: none; font-size: 16px; background: #f8c8dc; color: white; }
   </style>
 </head>
 <body>
   <header>28</header>
-  <main>
-    <section id="home" class="active">
-      <h2>Overview</h2>
-      <button onclick="logToday()">Log Period Start</button>
-      <p id="lastPeriod">Last: -</p>
-      <p id="nextPeriod">Next: -</p>
-    </section>
-    <section id="calendar">
-      <h2>Cycle Calendar</h2>
-      <div class="calendar-grid" id="calendarGrid"></div>
-    </section>
-    <section id="logs">
-      <h2>Symptom Tracker</h2>
-      <select id="symptom">
-        <option value="Cramps">Cramps</option><option value="Bloating">Bloating</option>
-        <option value="Mood Swings">Mood Swings</option><option value="Fatigue">Fatigue</option>
-        <option value="Backache">Backache</option><option value="Headache">Headache</option>
-      </select>
-      <button onclick="logSymptom()">Log Symptom</button>
-      <div id="symptomLog"></div>
-    </section>
-    <section id="insights">
-      <h2>AI Insights</h2>
-      <div id="aiOutput">Tracking...</div>
-    </section>
-    <section id="pregnancy">
-      <h2>Pregnancy Tracker</h2>
-      <input type="date" id="dueDate" />
-      <button onclick="trackPregnancy()">Save Due Date</button>
-      <p id="pregnancyInfo"></p>
-    </section>
-  </main>
-  <footer class="tabbar">
+  <section id="home" class="active">
+    <h2>Overview</h2>
+    <button onclick="logPeriod()">Log Period Start</button>
+    <div id="lastPeriod"></div>
+    <div id="nextPeriod"></div>
+  </section>
+  <section id="calendar"><h2>Cycle Calendar</h2><div class="calendar" id="calendarGrid"></div></section>
+  <section id="logs">
+    <h2>Log Symptoms</h2>
+    <select id="symptomSelect">
+      <option value="Cramps">Cramps</option>
+      <option value="Bloating">Bloating</option>
+      <option value="Mood Swings">Mood Swings</option>
+      <option value="Fatigue">Fatigue</option>
+    </select>
+    <button onclick="logSymptom()">Log Symptom</button>
+    <div id="symptomHistory"></div>
+  </section>
+  <section id="insights"><h2>AI Insights</h2><div id="aiInsights"></div></section>
+  <section id="pregnancy">
+    <h2>Pregnancy Tracker</h2>
+    <input type="date" id="dueDate">
+    <button onclick="trackPregnancy()">Track</button>
+    <div id="pregnancyOutput"></div>
+  </section>
+  <footer>
     <div class="tab active" onclick="switchTab('home')">Home</div>
     <div class="tab" onclick="switchTab('calendar')">Calendar</div>
     <div class="tab" onclick="switchTab('logs')">Logs</div>
@@ -65,102 +58,89 @@
   </footer>
   <script>
     const tabs = document.querySelectorAll(".tab");
-    const sections = document.querySelectorAll("main > section");
-    const calendarGrid = document.getElementById("calendarGrid");
-    const CYCLE_LENGTH = 28;
-    const PERIOD_LENGTH = 5;
-
+    const sections = document.querySelectorAll("section");
     function switchTab(id) {
       tabs.forEach(t => t.classList.remove("active"));
       sections.forEach(s => s.classList.remove("active"));
       event.target.classList.add("active");
       document.getElementById(id).classList.add("active");
     }
-
-    function logToday() {
-      localStorage.setItem("lastPeriod", new Date().toISOString());
-      renderOverview();
-      renderCalendar();
-      updateAI();
+    function logPeriod() {
+      const now = new Date().toISOString();
+      let periods = JSON.parse(localStorage.getItem("periods") || "[]");
+      periods.push(now);
+      localStorage.setItem("periods", JSON.stringify(periods));
+      renderOverview(); renderCalendar();
     }
-
     function logSymptom() {
-      const sym = document.getElementById("symptom").value;
-      const date = new Date().toISOString().split("T")[0];
+      const sym = document.getElementById("symptomSelect").value;
+      const today = new Date().toISOString().split('T')[0];
       let logs = JSON.parse(localStorage.getItem("symptoms") || "{}");
-      if (!logs[date]) logs[date] = [];
-      logs[date].push(sym);
+      logs[today] = (logs[today] || []).concat(sym);
       localStorage.setItem("symptoms", JSON.stringify(logs));
-      renderLogs();
-      updateAI();
+      renderLogs(); renderInsights();
     }
-
+    function trackPregnancy() {
+      const due = document.getElementById("dueDate").value;
+      const d = new Date(due);
+      const now = new Date();
+      const daysLeft = Math.floor((d - now) / (1000 * 3600 * 24));
+      const weeks = Math.floor((280 - daysLeft) / 7);
+      document.getElementById("pregnancyOutput").innerText =
+        daysLeft > 0 ? `Week ${weeks + 1} of pregnancy` : "Due date passed or invalid.";
+    }
     function renderOverview() {
-      const lp = localStorage.getItem("lastPeriod");
-      if (!lp) return;
-      const last = new Date(lp);
-      const next = new Date(last);
-      next.setDate(last.getDate() + CYCLE_LENGTH);
-      document.getElementById("lastPeriod").innerText = "Last: " + last.toDateString();
-      document.getElementById("nextPeriod").innerText = "Next: " + next.toDateString();
-    }
-
-    function renderCalendar() {
-      calendarGrid.innerHTML = "";
-      const base = new Date();
-      base.setDate(1);
-      const firstDay = base.getDay();
-      const daysInMonth = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate();
-      const lp = new Date(localStorage.getItem("lastPeriod"));
-
-      for (let i = 0; i < firstDay; i++) calendarGrid.innerHTML += `<div></div>`;
-      for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(base.getFullYear(), base.getMonth(), d);
-        const dayBox = document.createElement("div");
-        dayBox.className = "calendar-day";
-        dayBox.textContent = d;
-        if ((date - lp) / (1000 * 3600 * 24) % CYCLE_LENGTH < PERIOD_LENGTH) {
-          dayBox.classList.add("period");
-        }
-        calendarGrid.appendChild(dayBox);
+      let periods = JSON.parse(localStorage.getItem("periods") || "[]");
+      if (periods.length) {
+        const last = new Date(periods[periods.length - 1]);
+        const next = new Date(last); next.setDate(next.getDate() + 28);
+        document.getElementById("lastPeriod").innerText = `Last Period: ${last.toDateString()}`;
+        document.getElementById("nextPeriod").innerText = `Predicted Next: ${next.toDateString()}`;
       }
     }
-
+    function renderCalendar() {
+      const grid = document.getElementById("calendarGrid");
+      grid.innerHTML = "";
+      let periods = JSON.parse(localStorage.getItem("periods") || "[]");
+      let start = new Date(); start.setDate(1);
+      const first = start.getDay();
+      for (let i = 0; i < first; i++) grid.innerHTML += "<div></div>";
+      const days = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+      const lastPeriod = periods.length ? new Date(periods[periods.length - 1]) : null;
+      const ovulationDay = lastPeriod ? new Date(lastPeriod) : null;
+      if (ovulationDay) ovulationDay.setDate(ovulationDay.getDate() + 14);
+      for (let i = 1; i <= days; i++) {
+        const cell = document.createElement("div");
+        cell.className = "day";
+        const date = new Date(start.getFullYear(), start.getMonth(), i);
+        cell.innerText = i;
+        if (lastPeriod && (date - lastPeriod) / (1000 * 3600 * 24) < 5) cell.classList.add("period");
+        if (ovulationDay && date.toDateString() === ovulationDay.toDateString()) cell.classList.add("ovulation");
+        grid.appendChild(cell);
+      }
+    }
     function renderLogs() {
       const logs = JSON.parse(localStorage.getItem("symptoms") || "{}");
-      let out = "<ul>";
-      for (const [date, arr] of Object.entries(logs)) {
-        out += `<li>${date}: ${arr.join(", ")}</li>`;
+      let html = "<ul>";
+      for (const date in logs) {
+        html += `<li>${date}: ${logs[date].join(", ")}</li>`;
       }
-      out += "</ul>";
-      document.getElementById("symptomLog").innerHTML = out;
+      html += "</ul>";
+      document.getElementById("symptomHistory").innerHTML = html;
     }
-
-    function updateAI() {
+    function renderInsights() {
       const logs = JSON.parse(localStorage.getItem("symptoms") || "{}");
       const counts = {};
-      for (const arr of Object.values(logs)) {
-        for (const sym of arr) counts[sym] = (counts[sym] || 0) + 1;
+      for (const day in logs) {
+        logs[day].forEach(sym => counts[sym] = (counts[sym] || 0) + 1);
       }
-      let out = "";
-      for (const [sym, count] of Object.entries(counts)) {
-        if (count > 2) out += `<p>You often report <strong>${sym}</strong> (${count}x)</p>`;
+      let html = "";
+      for (const sym in counts) {
+        if (counts[sym] > 2) html += `<p>AI Insight: You often report <strong>${sym}</strong></p>`;
       }
-      document.getElementById("aiOutput").innerHTML = out || "<p>Track more to generate patterns.</p>";
+      document.getElementById("aiInsights").innerHTML = html || "<p>Track more to get insights.</p>";
     }
-
-    function trackPregnancy() {
-      const due = new Date(document.getElementById("dueDate").value);
-      const now = new Date();
-      const daysLeft = Math.ceil((due - now) / (1000 * 3600 * 24));
-      document.getElementById("pregnancyInfo").innerText =
-        daysLeft > 0 ? `${daysLeft} days until due date.` : "Congratulations or overdue!";
-    }
-
-    renderOverview();
-    renderCalendar();
-    renderLogs();
-    updateAI();
+    renderOverview(); renderCalendar(); renderLogs(); renderInsights();
   </script>
 </body>
 </html>
